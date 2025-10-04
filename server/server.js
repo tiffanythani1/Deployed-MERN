@@ -1,25 +1,28 @@
-// server.js
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
-import records from "./routes/record.js";
+import { initDB } from "./db/connection.js";
 
-dotenv.config(); // loads PORT from .env
-
-const PORT = process.env.PORT || 5050;
 const app = express();
+
+console.log("BOOT pid=%s cwd=%s", process.pid, process.cwd());
+
+app.use((req, _res, next) => {           // <— logger
+  console.log("HIT", req.method, req.url);
+  next();
+});
 
 app.use(cors());
 app.use(express.json());
 
-// simple router mounted at /record
+// root + diag
+app.get("/", (_req, res) => res.send("SkinLumina API running. Try /__whoami or /record"));
+app.get("/__whoami", (_req, res) => res.json({ ok: true, from: "server.js", pid: process.pid }));
+
+import records from "./routes/record.js";
 app.use("/record", records);
 
-app.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}`);
-});
-
-
-//we are importing express and cors to be used. 
-// const port = process.env.PORT will access the port variable 
-// from the config.env we’ll create next.
+const PORT = process.env.PORT || 5050;
+(async () => {
+  await initDB("skinlumina");
+  app.listen(PORT, () => console.log("Listening on http://localhost:%s", PORT));
+})();
