@@ -9,9 +9,13 @@ router.get("/__whoami", (_req, res) => {
 });
 
 router.get("/", async (_req, res) => {
+   // return null;
   try {
     //const url = await Cloudinary.uploadimage("myimage");
-    const docs = await getDB().collection("skinlumina").find({}).toArray();
+    //const docs = await getDB().collection("skinlumina").find({}).toArray(); testt
+const docs = await getDB().collection("records").find({}).toArray();
+
+    console.log("this is the docs!!!:", docs)
     
     res.status(200).json(docs);
   } catch (err) {
@@ -25,10 +29,13 @@ router.get("/", async (_req, res) => {
 
 // --- DB health for the records collection ---
 router.get("/__db", async (_req, res) => {
+    //return null;
   try {
     const db = getDB();                       // ← this is what we’re testing
     const name = db.databaseName;
     const col = db.collection("records");
+
+    console.log("Hey we're here...!", col)
 
     // lightweight checks
     const count = await col.estimatedDocumentCount();
@@ -53,6 +60,7 @@ router.get("/__db", async (_req, res) => {
 // safer id route name to avoid collisions
 router.get("/by-id/:id", async (req, res) => {
   const { id } = req.params;
+    //return null;
   if (!ObjectId.isValid(id)) return res.status(400).send("Invalid id");
   try {
     const doc = await getDB().collection("records").findOne({ _id: new ObjectId(id) });
@@ -67,11 +75,13 @@ router.get("/by-id/:id", async (req, res) => {
 // This section will help you get a single record by id
 router.get("/:id", async (req, res) => {
   let collection = await getDB().collection("records");
-  let query = { _id: new ObjectId(req.params.id) };
+  let query = { _id: new ObjectId(req.params.id) };  
   let result = await collection.findOne(query);
 
   if (!result) res.send("Not found").status(404);
   else res.send(result).status(200);
 });
+
+
 
 export default router;

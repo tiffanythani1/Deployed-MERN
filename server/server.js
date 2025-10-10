@@ -1,8 +1,14 @@
 import express from "express";
 import cors from "cors";
 import { initDB } from "./db/connection.js";
+import "dotenv/config";   // to loads .env immediately
+
+//mounting the router for the media.js
+
+import media from "./routes/media.js";
 
 const app = express();
+app.use("/media", media);
 
 console.log("BOOT pid=%s cwd=%s", process.pid, process.cwd());
 
