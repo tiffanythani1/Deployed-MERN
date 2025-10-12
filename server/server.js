@@ -8,6 +8,8 @@ import "dotenv/config";   // to loads .env immediately
 import media from "./routes/media.js";
 
 const app = express();
+app.use(cors());
+app.use(express.json());
 app.use("/media", media);
 
 console.log("BOOT pid=%s cwd=%s", process.pid, process.cwd());
@@ -17,8 +19,8 @@ app.use((req, _res, next) => {           // <— logger
   next();
 });
 
-app.use(cors());
-app.use(express.json());
+//app.use(cors());
+//app.use(express.json());
 
 // root + diag
 app.get("/", (_req, res) => res.send("SkinLumina API running. Try /__whoami or /record"));

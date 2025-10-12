@@ -15,10 +15,17 @@ export default function Upload({ onUploaded }) {
       const form = new FormData();
       form.append("file", file); // <-- must be "file" to match upload.single("file")
 
-      const r = await fetch(import.meta.env.VITE_API_BASE + "/media/upload", {
-        method: "POST",
-        body: form,
-      });
+
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5050";
+console.log("API_BASE ->", API_BASE);
+
+const r = await fetch(`${API_BASE}/media/upload`, {
+  method: "POST",
+  body: form,
+});
+
+
+
       if (!r.ok) throw new Error("Upload failed");
       const doc = await r.json();
 
