@@ -39,6 +39,7 @@ router.post("/upload", upload.single("file"), async (req, res) => {
   }
 });
 
+
 // GET /media/images  (for your gallery)
 router.get("/images", async (_req, res) => {
   const imgs = await getDB().collection("images")
@@ -46,4 +47,29 @@ router.get("/images", async (_req, res) => {
   res.json(imgs);
 });
 
+// DELETE /media?public_id=skinlumina/pi/yqkrdzfxxmamotqih9dm
+router.delete("/", async (req, res) => {
+  const public_id = req.query.public_id; // includes slashes
+  if (!public_id) return res.status(400).json({ ok: false, error: "public_id is required" });
+
+  try {
+    const result = await cloudinary.uploader.destroy(public_id, { resource_type: "image", invalidate: true });
+
+    // remove from Mongo either way; if not present, deletedCount = 0
+    const mongoRes = await getDB().collection("images").deleteOne({ public_id });
+
+    res.json({
+      ok: true,
+      cloudinary: result,            // { result: 'ok' | 'not found' | ... }
+      mongo_deleted: mongoRes.deletedCount
+    });
+  } catch (err) {
+    console.error("Delete error:", err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+
 export default router;
+
+
