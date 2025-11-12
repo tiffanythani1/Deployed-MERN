@@ -67,14 +67,46 @@ router.get("/images", async (_req, res) => {
 });
 
 // GET /media/images/:id  (single doc, includes meta)
-router.get("/images/:id", async (req, res) => {
+/*router.get("/images/:id", async (req, res) => {
   const { id } = req.params;
   if (!ObjectId.isValid(id)) return res.status(400).json({ error: "invalid_id" });
 
   const doc = await getDB().collection("images").findOne({ _id: new ObjectId(id) });
   if (!doc) return res.status(404).json({ error: "not_found" });
   res.json(doc);
+});*/
+
+// GET /media/images/:id  (single doc, includes meta)
+router.get("/images/:id", async (req, res) => {
+  const { id } = req.params;
+  if (!ObjectId.isValid(id)) {
+    return res.status(400).json({ error: "invalid_id" });
+  }
+
+  try {
+    const doc = await getDB().collection("images").findOne({ _id: new ObjectId(id) });
+    if (!doc) {
+      return res.status(404).json({ error: "not_found" });
+    }
+
+    // Explicitly include fields you care about (meta included)
+    res.json({
+      _id: doc._id,
+      public_id: doc.public_id,
+      url: doc.url,
+      width: doc.width,
+      height: doc.height,
+      bytes: doc.bytes,
+      format: doc.format,
+      createdAt: doc.createdAt,
+      meta: doc.meta || {}, // ✅ ensures blob info is always returned
+    });
+  } catch (err) {
+    console.error("GET /media/images/:id error:", err);
+    res.status(500).json({ error: err.message });
+  }
 });
+
 
 // DELETE /media?public_id=skinlumina/pi/...
 router.delete("/", async (req, res) => {

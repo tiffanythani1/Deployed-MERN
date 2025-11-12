@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import Upload from "./components/Upload.jsx";
 import Navbar from "./components/Navbar.jsx";
+import PatientRow from "./components/PatientRow.jsx";
+
 export default function App() {
   const [images, setImages] = useState([]);
 
@@ -34,20 +36,23 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex flex-col items-center">
-
+      <Navbar /> 
       {/* Header */}
-      <header className="w-full max-w-5xl mx-auto px-6 pt-14 pb-8 text-center">
-        <h1 className="text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-          SkinLumina
+
+
+      <header className="w-full max-w-5xl mx-auto px-6 pt-24 pb-12 text-center">
+        <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-[#00274D]">
+          SkinLumina <span className="font-light">Patient Portal</span>
         </h1>
-        <p className="mt-3 text-lg text-slate-600 dark:text-slate-300">
+        <p className="mt-3 text-lg text-gray-600">
           Multispectral dermatology imaging, simplified.
         </p>
       </header>
 
+
       {/* Gallery */}
       <main className="w-full max-w-5xl mx-auto px-6 pb-16">
-        <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <section className="grid grid-cols-1 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {images.map((img) => (
             <button
               key={img._id}
@@ -105,6 +110,11 @@ export default function App() {
 }
 
 function DetailsModal({ doc, loading, error, onClose }) {
+  const meta = doc?.meta || {};
+  const blobs = Array.isArray(meta.blobs) ? meta.blobs : [];
+  const blobCount = meta.counts?.blobs ?? blobs.length ?? 0;
+  const totalMs = typeof meta.timing_ms === "number" ? meta.timing_ms.toFixed(1) : "—";
+
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4">
       <div className="w-full max-w-4xl rounded-2xl bg-white dark:bg-slate-900 shadow-xl overflow-hidden">
@@ -126,6 +136,7 @@ function DetailsModal({ doc, loading, error, onClose }) {
           <div className="p-6 text-red-600">Error: {error}</div>
         ) : doc ? (
           <div className="grid md:grid-cols-2 gap-6 p-6">
+            {/* Image side */}
             <div className="rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-800">
               <img src={doc.url} alt={doc.public_id} className="w-full object-contain" />
               <div className="p-3 text-sm text-slate-600 dark:text-slate-300">
@@ -139,42 +150,47 @@ function DetailsModal({ doc, loading, error, onClose }) {
               </div>
             </div>
 
+            {/* Metadata + blob table */}
             <div className="p-1">
-              <InfoRow label="Center Hex" value={doc.meta?.center_pixel?.hex ?? "—"} mono />
+              <InfoRow label="Center Hex" value={meta.center_pixel?.hex ?? "—"} mono />
               <InfoRow
                 label="Resolution"
-                value={`${doc.meta?.image?.width ?? doc.width ?? "—"} × ${
-                  doc.meta?.image?.height ?? doc.height ?? "—"
+                value={`${meta.image?.width ?? doc.width ?? "—"} × ${
+                  meta.image?.height ?? doc.height ?? "—"
                 }`}
               />
-              <InfoRow label="Anomalies" value={`${doc.meta?.counts?.anomalies ?? 0}`} />
-              <InfoRow label="Total (ms)" value={`${doc.meta?.timing?.total_ms ?? "—"}`} />
+              <InfoRow label="Anomalies" value={blobCount} />
+              <InfoRow label="Processing Time (ms)" value={totalMs} />
 
-              {Array.isArray(doc.meta?.regions) && doc.meta.regions.length > 0 && (
+              {blobs.length > 0 && (
                 <div className="mt-4">
                   <h3 className="font-medium mb-2 text-slate-900 dark:text-slate-100">
-                    Regions
+                    Detected Anomalies
                   </h3>
                   <div className="max-h-48 overflow-auto rounded border border-slate-200 dark:border-slate-700">
                     <table className="w-full text-sm">
                       <thead className="bg-slate-50 dark:bg-slate-800/70">
                         <tr>
-                          <th className="text-left px-3 py-2 font-medium">X</th>
-                          <th className="text-left px-3 py-2 font-medium">Y</th>
-                          <th className="text-left px-3 py-2 font-medium">W</th>
-                          <th className="text-left px-3 py-2 font-medium">H</th>
+                          <th className="text-left px-3 py-2 font-medium">ID</th>
+                          <th className="text-left px-3 py-2 font-medium">Location (x, y)</th>
+                          <th className="text-left px-3 py-2 font-medium">Diameter (µm)</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {doc.meta.regions.map((r, i) => (
+                        {blobs.map((b, i) => (
                           <tr
-                            key={i}
+                            key={b.blob_id ?? i}
                             className="odd:bg-white even:bg-slate-50 dark:odd:bg-slate-900 dark:even:bg-slate-900/70"
                           >
-                            <td className="px-3 py-1 font-mono">{r.x}</td>
-                            <td className="px-3 py-1 font-mono">{r.y}</td>
-                            <td className="px-3 py-1 font-mono">{r.w}</td>
-                            <td className="px-3 py-1 font-mono">{r.h}</td>
+                            <td className="px-3 py-1 font-mono">{b.blob_id ?? i + 1}</td>
+                            <td className="px-3 py-1 font-mono">
+                              ({b.center_x ?? "—"}, {b.center_y ?? "—"})
+                            </td>
+                            <td className="px-3 py-1 font-mono">
+                              {typeof b.diameter_um === "number"
+                                ? b.diameter_um.toFixed(1)
+                                : "—"}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -191,6 +207,7 @@ function DetailsModal({ doc, loading, error, onClose }) {
     </div>
   );
 }
+
 
 function InfoRow({ label, value, mono }) {
   return (

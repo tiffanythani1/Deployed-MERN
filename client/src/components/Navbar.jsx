@@ -1,18 +1,12 @@
-import { Link } from "react-router-dom";
-import logo from "../assets/Skinlumina_Logo.png";
-
 export default function Navbar() {
   return (
-    <nav className="bg-white shadow-md py-3 px-6 flex justify-between items-center">
-      <div className="flex items-center space-x-3">
-        <img src={logo} alt="SkinLumina Logo" className="h-10 w-10 rounded-full" />
-        <Link to="/" className="text-2xl font-bold text-indigo-700">
-          SkinLumina
-        </Link>
-      </div>
-      <div className="flex space-x-4 text-gray-600 font-medium">
-        <Link to="/" className="hover:text-indigo-600">Gallery</Link>
-        <Link to="/upload" className="hover:text-indigo-600">Upload</Link>
+    <nav className="fixed top-0 left-0 w-full bg-transparent py-4 px-8 z-50">
+      <div className="flex items-center justify-start">
+        <img
+          src="https://res.cloudinary.com/dppdnwp38/image/upload/f_auto,q_auto,w_120,h_40,c_fit,b_transparent/v1762387813/Skinlumina_Logo_xwjvch.png"
+          alt="SkinLumina Logo"
+          className="h-10 w-auto"
+        />
       </div>
     </nav>
   );
