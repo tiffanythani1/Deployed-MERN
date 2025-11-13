@@ -3,9 +3,9 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 w-full bg-transparent py-4 px-8 z-50">
       <div className="flex items-center justify-start">
         <img
-          src="https://res.cloudinary.com/dppdnwp38/image/upload/f_auto,q_auto,w_120,h_40,c_fit,b_transparent/v1762387813/Skinlumina_Logo_xwjvch.png"
+          src="https://res.cloudinary.com/dppdnwp38/image/upload/v1762977396/logoo_icwdbg.png"
           alt="SkinLumina Logo"
-          className="h-10 w-auto"
+          className="h-20 w-56 object-contain"
         />
       </div>
     </nav>

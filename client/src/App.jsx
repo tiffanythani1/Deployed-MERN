@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Upload from "./components/Upload.jsx";
 import Navbar from "./components/Navbar.jsx";
 import PatientRow from "./components/PatientRow.jsx";
+import ZoomPanImage from "./components/ZoomPanImage.jsx";
 
 export default function App() {
   const [images, setImages] = useState([]);
@@ -52,34 +53,21 @@ export default function App() {
 
       {/* Gallery */}
       <main className="w-full max-w-5xl mx-auto px-6 pb-16">
-        <section className="grid grid-cols-1 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {images.map((img) => (
-            <button
-              key={img._id}
-              onClick={() => setSelectedId(img._id)}
-              className="text-left"
-              title="View details"
-            >
-              <article className="overflow-hidden rounded-2xl bg-white shadow-lg outline outline-black/5 transition hover:shadow-xl dark:bg-slate-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10">
-                <div className="aspect-[4/3] w-full bg-slate-200 dark:bg-slate-700">
-                  <img
-                    src={img.url}
-                    alt={img.public_id}
-                    className="h-full w-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.style.display = "none";
-                    }}
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                    {img.public_id}
-                  </h3>
-                </div>
-              </article>
-            </button>
-          ))}
-        </section>
+<div className="space-y-8">
+  {images
+    .reduce((rows, _, i) => {
+      if (i % 5 === 0) rows.push(images.slice(i, i + 5));
+      return rows;
+    }, [])
+    .map((rowImgs, idx) => (
+      <PatientRow
+        key={idx}
+        images={rowImgs}
+        onSelect={(id) => setSelectedId(id)}
+      />
+    ))}
+</div>
+
 
         {/* Upload Button */}
         <div className="mt-10 flex justify-center">
@@ -137,18 +125,19 @@ function DetailsModal({ doc, loading, error, onClose }) {
         ) : doc ? (
           <div className="grid md:grid-cols-2 gap-6 p-6">
             {/* Image side */}
-            <div className="rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-800">
-              <img src={doc.url} alt={doc.public_id} className="w-full object-contain" />
-              <div className="p-3 text-sm text-slate-600 dark:text-slate-300">
-                <div>
-                  Public ID: <span className="font-mono">{doc.public_id}</span>
-                </div>
-                <div>
-                  Uploaded:{" "}
-                  {doc.createdAt ? new Date(doc.createdAt).toLocaleString() : "—"}
-                </div>
-              </div>
-            </div>
+           {/* Image side (zoom + pan enabled) */}
+<div className="rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-800">
+  <ZoomPanImage src={doc.url} alt={doc.public_id} />
+  <div className="p-3 text-sm text-slate-600 dark:text-slate-300">
+    <div>
+      Public ID: <span className="font-mono">{doc.public_id}</span>
+    </div>
+    <div>
+      Uploaded: {doc.createdAt ? new Date(doc.createdAt).toLocaleString() : "—"}
+    </div>
+  </div>
+</div>
+
 
             {/* Metadata + blob table */}
             <div className="p-1">

@@ -1,87 +1,110 @@
 // client/src/components/PatientRow.jsx
 
-export default function PatientRow({ images }) {
+export default function PatientRow({ images, onSelect }) {
   if (!images || images.length === 0) return null;
 
-  // Use the first image's meta as a representative summary for this "client"
-  const first = images[0];
-  const baseMeta = first.meta || first;
+  // gather all meta objects
+  const metas = images.map((img) => img.meta || {});
 
-  // Sum blobs across this row's images (total detected spots for this client)
-  const totalBlobs = images.reduce((sum, img) => {
-    const m = img.meta || img;
-    return sum + (m.blobs || 0);
-  }, 0);
+  // --- compute summary across 5 images ---
+  const maxBlobs = Math.max(
+    ...metas.map((m) =>
+      typeof m.counts?.blobs === "number" ? m.counts.blobs : 0
+    )
+  );
+
+  // find most recent image by createdAt (if available) or meta.date
+  const sortedByDate = images
+    .map((img) => ({
+      ...img,
+      _d: Date.parse(img.meta?.date || img.createdAt || 0),
+    }))
+    .filter((i) => !isNaN(i._d))
+    .sort((a, b) => b._d - a._d);
+
+  const latest = sortedByDate[0];
+  const latestMeta = latest?.meta || {};
+  const latestDate =
+    latestMeta.date ||
+    (latest?.createdAt
+      ? new Date(latest.createdAt).toLocaleDateString()
+      : "—");
+  const latestHex = latestMeta.center_pixel?.hex || "—";
 
   return (
     <div className="flex items-start gap-6 my-8">
-      {/* Left sidebar with client summary */}
-      <div className="w-64 bg-white shadow-md rounded-2xl p-4">
+      {/* Sidebar */}
+      <div className="w-64 bg-white dark:bg-slate-800 shadow-md rounded-2xl p-4">
         <h2 className="text-lg font-semibold mb-3">
-          {/* Placeholder label until you wire real patient IDs */}
-          Medical Client
-        </h2>
+  {latestMeta.patient ?? "Medical Client"}
+</h2>
 
-        <p className="text-sm text-gray-700">
+        <p className="text-sm text-gray-700 dark:text-gray-300">
           Number of Detected Spots:{" "}
-          <span className="font-semibold text-sky-700">
-            {totalBlobs}
-          </span>
+          <span className="font-semibold text-sky-700">{maxBlobs}</span>
         </p>
-
-        <p className="text-sm text-gray-700">
-          Capture Date:{" "}
-          <span className="font-mono">
-            {baseMeta.date || "—"}
-          </span>
+        <p className="text-sm text-gray-700 dark:text-gray-300">
+          Capture Date: <span className="font-mono">{latestDate}</span>
         </p>
-
-        <p className="text-sm text-gray-700">
-          Center HEX (sample):{" "}
-          <span className="font-mono">
-            {baseMeta.center_hex || "—"}
-          </span>
-        </p>
-
-        <p className="text-xs text-gray-500 mt-2">
-          Avg lesion diameter (µm):{" "}
-          {baseMeta.avg_diam_um !== "" && baseMeta.avg_diam_um != null
-            ? baseMeta.avg_diam_um
-            : "—"}
-        </p>
-
-        <p className="text-xs text-gray-500">
-          Processing time (ms):{" "}
-          {baseMeta.total_ms != null ? baseMeta.total_ms : "—"}
+        <p className="text-sm text-gray-700 dark:text-gray-300">
+          Center HEX :{" "}
+          <span className="font-mono">{latestHex}</span>
         </p>
       </div>
 
-      {/* Right side: 5-wide grid of this client's images */}
-      <div className="grid grid-cols-5 gap-4 flex-1">
-        {images.map((img) => {
-          const m = img.meta || img;
+      {/* Image grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 flex-1">
+        {images.map((img) => (
+          <button
+            key={img._id}
+            onClick={() => onSelect?.(img._id)}
+            className="text-left"
+            title="View details"
+          >
+<article
+  className="relative overflow-hidden rounded-2xl bg-white shadow-lg outline outline-black/5 transition-transform duration-300 hover:scale-105 hover:shadow-2xl dark:bg-slate-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10 group"
+  onClick={() => onSelect?.(img._id)}
+>
+  {/* Image */}
+  <div className="aspect-[4/3] w-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+    <img
+      src={img.url}
+      alt={img.public_id}
+      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+      onError={(e) => {
+        e.currentTarget.style.display = "none";
+      }}
+    />
+  </div>
 
-          return (
-            <div
-              key={img._id || m.file}
-              className="bg-white rounded-xl shadow overflow-hidden"
-            >
-              <img
-                src={img.url}
-                alt={m.file}
-                className="w-full h-40 object-cover"
-              />
-              <div className="px-2 py-1">
-                <p className="text-[10px] text-gray-600 truncate">
-                  {m.file}
-                </p>
-                <p className="text-[10px] text-gray-500">
-                  Spots: {m.blobs ?? "—"} • HEX: {m.center_hex ?? "—"}
-                </p>
-              </div>
-            </div>
-          );
-        })}
+  {/* Overlay on hover */}
+  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center text-white text-sm">
+    <p className="font-semibold mb-1">
+      HEX: {img.meta?.center_pixel?.hex ?? "—"}
+    </p>
+    <p className="mb-1">
+      Spots: {img.meta?.counts?.blobs ?? (img.meta?.blobs?.length ?? "—")}
+    </p>
+    <p>
+      Date:{" "}
+      {img.meta?.date
+        ? img.meta.date
+        : img.createdAt
+        ? new Date(img.createdAt).toLocaleDateString()
+        : "—"}
+    </p>
+  </div>
+
+  {/* Footer (still shows the ID below image) */}
+  <div className="p-4">
+    <h3 className="text-sm font-medium text-slate-700 dark:text-slate-200 truncate">
+      {img.public_id}
+    </h3>
+  </div>
+</article>
+
+          </button>
+        ))}
       </div>
     </div>
   );
