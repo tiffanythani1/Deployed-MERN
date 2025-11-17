@@ -30,14 +30,23 @@ export default function PatientRow({ images, onSelect }) {
       ? new Date(latest.createdAt).toLocaleDateString()
       : "—");
   const latestHex = latestMeta.center_pixel?.hex || "—";
+    
+  
+
+  const patientLabel =
+  latestMeta.patient && latestMeta.patient !== "Unknown"
+    ? latestMeta.patient
+    : "Medical Client";
+
 
   return (
     <div className="flex items-start gap-6 my-8">
       {/* Sidebar */}
       <div className="w-64 bg-white dark:bg-slate-800 shadow-md rounded-2xl p-4">
         <h2 className="text-lg font-semibold mb-3">
-  {latestMeta.patient ?? "Medical Client"}
+  {patientLabel}
 </h2>
+
 
         <p className="text-sm text-gray-700 dark:text-gray-300">
           Number of Detected Spots:{" "}
@@ -53,7 +62,9 @@ export default function PatientRow({ images, onSelect }) {
       </div>
 
       {/* Image grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 flex-1">
+      <div className="grid grid-cols-6 gap-6 flex-1">
+
+
         {images.map((img) => (
           <button
             key={img._id}

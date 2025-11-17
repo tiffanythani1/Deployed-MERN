@@ -7,9 +7,12 @@ import { ObjectId } from "mongodb";
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() }); // no temp files
 
+
 // POST /media/upload   (expects field name: "file" and optional text field "meta")
 router.post("/upload", upload.single("file"), async (req, res) => {
   try {
+    //delete if the world crashes
+    
     if (!req.file) return res.status(400).json({ error: "No file provided" });
 
     // 1) Upload buffer -> Cloudinary
@@ -32,6 +35,8 @@ router.post("/upload", upload.single("file"), async (req, res) => {
       }
     }
 
+    const variant = req.body.variant || null;
+
     // 3) Build Mongo doc
     const doc = {
       public_id: uploaded.public_id,
@@ -41,6 +46,7 @@ router.post("/upload", upload.single("file"), async (req, res) => {
       bytes: uploaded.bytes,
       format: uploaded.format,
       meta,                 // ⬅️ your center hex, timings, regions, etc.
+      variant,
       createdAt: new Date(),
     };
 
@@ -98,7 +104,9 @@ router.get("/images/:id", async (req, res) => {
       height: doc.height,
       bytes: doc.bytes,
       format: doc.format,
+      variant: doc.variant || null, 
       createdAt: doc.createdAt,
+      
       meta: doc.meta || {}, // ✅ ensures blob info is always returned
     });
   } catch (err) {
