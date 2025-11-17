@@ -140,8 +140,21 @@ function DetailsModal({ doc, loading, error, onClose }) {
   const totalMs = typeof meta.timing_ms === "number" ? meta.timing_ms.toFixed(1) : "—";
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4">
-      <div className="w-full max-w-4xl rounded-2xl bg-white dark:bg-slate-900 shadow-xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2">
+  <div
+    className="
+      w-full
+      max-w-lg            /* mobile width */
+      md:max-w-4xl        /* desktop width */
+      max-h-[90vh]        /* prevent content from overflowing screen */
+      overflow-y-auto     /* scroll if content is tall */
+      rounded-2xl
+      bg-white
+      dark:bg-slate-900
+      shadow-xl
+    "
+  >
+
         <div className="flex items-center justify-between px-5 py-3 border-b border-slate-200 dark:border-slate-700">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
             Image Details
