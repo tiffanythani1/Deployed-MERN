@@ -88,7 +88,7 @@ export default function App() {
     
 <div className="space-y-8">
   {images
-    .filter(img => img.variant !== "plot")
+    //.filter(img => img.variant !== "plot")
     .reduce((rows, _, i) => {
       if (i % 6 === 0) rows.push(images.slice(i, i + 6));
       return rows;
