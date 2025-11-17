@@ -67,7 +67,7 @@ router.get("/images", async (_req, res) => {
     .collection("images")
     .find({})
     .sort({ createdAt: -1 })
-    .limit(60)
+    .limit(100)
     .toArray();
   res.json(imgs);
 });
