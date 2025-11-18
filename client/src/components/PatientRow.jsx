@@ -22,7 +22,7 @@ export default function PatientRow({ images, onSelect }) {
     .filter((i) => !isNaN(i._d))
     .sort((a, b) => a._d - b._d); // ASCENDING → earliest first
 
-const first = sortedByDate[0]; // this is the FIRST image captured
+const first = sortedByDate[1]; // this is the FIRST image captured
 const firstMeta = first?.meta || {};
 
 const firstDate =
