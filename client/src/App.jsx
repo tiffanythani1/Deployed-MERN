@@ -8,7 +8,7 @@ import Analytics from "./components/Analytics.jsx";
 
 export default function App() {
   const [images, setImages] = useState([]);
-  const [tab, setTab] = useState("patients"); // "patients" | "analytics"
+  
 
   // Modal state
   const [selectedId, setSelectedId] = useState(null);
@@ -42,29 +42,6 @@ export default function App() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex flex-col items-center">
       <Navbar /> 
 
-    <div className="flex gap-4 mt-24">
-  <button
-    onClick={() => setTab("patients")}
-    className={`px-4 py-2 rounded-xl shadow ${
-      tab === "patients"
-        ? "bg-[#00274D] text-white"
-        : "bg-white text-[#00274D]"
-    }`}
-  >
-    Patients
-  </button>
-
-  <button
-    onClick={() => setTab("analytics")}
-    className={`px-4 py-2 rounded-xl shadow ${
-      tab === "analytics"
-        ? "bg-[#00274D] text-white"
-        : "bg-white text-[#00274D]"
-    }`}
-  >
-    Analytics
-  </button>
-</div>
 
 
 
@@ -73,7 +50,7 @@ export default function App() {
 
       <header className="w-full max-w-6xl mx-auto px-6 pt-24 pb-12 text-center">
         <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-[#00274D]">
-          SkinLumina <span className="font-light">Clinical Imaging Review Portal</span>
+          SkinLumina <span className="font-light">Clinical Imaging Review</span>
         </h1>
         <p className="mt-3 text-lg text-gray-600">
           Multispectral dermatology imaging, simplified.
@@ -82,7 +59,7 @@ export default function App() {
 
 
      {/* Gallery */}
-{tab === "patients" && (
+
   <main className="w-full max-w-6xl mx-auto px-6 pb-16">
 
     
@@ -113,7 +90,7 @@ export default function App() {
           />
         </div>
         </main>
-)}
+
 
 
       {/* Details Modal */}
