@@ -20,25 +20,24 @@ export default function PatientRow({ images, onSelect }) {
       _d: Date.parse(img.meta?.date || img.createdAt || 0),
     }))
     .filter((i) => !isNaN(i._d))
-    .sort((a, b) => b._d - a._d);
+    .sort((a, b) => a._d - b._d); // ASCENDING → earliest first
 
-  const latest = sortedByDate[0];
-  const latestMeta = latest?.meta || {};
-  const latestDate =
-    latestMeta.date ||
-    (latest?.createdAt
-      ? new Date(latest.createdAt).toLocaleDateString()
-      : "—");
-  const latestHex = latestMeta.center_pixel?.hex || "—";
-    
-  
+const first = sortedByDate[0]; // this is the FIRST image captured
+const firstMeta = first?.meta || {};
 
-  const patientLabel =
-  latestMeta.patient && latestMeta.patient !== "Unknown"
-    ? latestMeta.patient
+const firstDate =
+  firstMeta.date ||
+  (first?.createdAt
+    ? new Date(first.createdAt).toLocaleDateString()
+    : "—");
+
+const firstHex = firstMeta.center_pixel?.hex || "—";
+
+const patientLabel =
+  firstMeta.patient && firstMeta.patient !== "Unknown"
+    ? firstMeta.patient
     : "Medical Client";
-
-
+    
   return (
     <div className="flex items-start gap-6 my-8">
       {/* Sidebar */}
