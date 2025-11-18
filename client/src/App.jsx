@@ -73,7 +73,7 @@ export default function App() {
 
       <header className="w-full max-w-6xl mx-auto px-6 pt-24 pb-12 text-center">
         <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-[#00274D]">
-          SkinLumina <span className="font-light">Clinical Imaging Review Portal</span>
+          SkinLumina <span className="font-light">Clinical Imaging Review </span>
         </h1>
         <p className="mt-3 text-lg text-gray-600">
           Multispectral dermatology imaging, simplified.
