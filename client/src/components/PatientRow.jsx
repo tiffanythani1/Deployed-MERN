@@ -65,10 +65,7 @@ export default function PatientRow({ images, onSelect }) {
       <div className="grid grid-cols-6 gap-6 flex-1">
 
 
-        {images
-  .filter((img) => img.variant !== "plot")   // <-- Hides charts on Patients page
-  .map((img) => (
-
+        {images.map((img) => (
 
           <button
             key={img._id}
