@@ -56,7 +56,7 @@ const patientLabel =
         </p>
         <p className="text-sm text-gray-700 dark:text-gray-300">
           Center HEX :{" "}
-          <span className="font-mono">{firstDate}</span>
+          <span className="font-mono">{firstHex}</span>
         </p>
       </div>
 
