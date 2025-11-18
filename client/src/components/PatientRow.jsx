@@ -37,7 +37,7 @@ const patientLabel =
   firstMeta.patient && firstMeta.patient !== "Unknown"
     ? firstMeta.patient
     : "Medical Client";
-    
+
   return (
     <div className="flex items-start gap-6 my-8">
       {/* Sidebar */}
@@ -52,11 +52,11 @@ const patientLabel =
           <span className="font-semibold text-sky-700">{maxBlobs}</span>
         </p>
         <p className="text-sm text-gray-700 dark:text-gray-300">
-          Capture Date: <span className="font-mono">{latestDate}</span>
+          Capture Date: <span className="font-mono">{firstDate}</span>
         </p>
         <p className="text-sm text-gray-700 dark:text-gray-300">
           Center HEX :{" "}
-          <span className="font-mono">{latestHex}</span>
+          <span className="font-mono">{firstDate}</span>
         </p>
       </div>
 
